@@ -10,7 +10,7 @@ body, html {
     #character {
         width: 120px !important;
         height: 120px !important;
-        bottom: 55px !important;
+        bottom: 7% !important;
     }
 
     .fallingEmoji {
