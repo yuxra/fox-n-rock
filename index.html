@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avoid the Falling Emojis</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Tampilan Awal -->
+    <div id="startScreen">
+        <div id="welcomeMessage">Avoid the rock!</div>
+        <button id="playButton">Play</button>
+    </div>
+
+    <!-- Game Area (disembunyikan hingga tombol play diklik) -->
+    <div id="gameArea" style="display: none;">
+        <div id="character"></div>
+        <div id="lives">Nyawa: 3</div>
+        <div id="gameOverScreen" class="hidden">
+            <div id="gameOverText">Game Over</div>
+            <button id="restartButton">Restart</button>
+        </div>
+    </div>
+
+    <!-- Audio background music -->
+    <audio id="backgroundMusic" autoplay loop muted>
+        <source src="Pou music ost  MemoryFind Pou.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Sound effect when hit -->
+    <audio id="hitSound">
+        <source src="Fox_hurt4.ogg" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Sound effect when game over -->
+    <audio id="gameOverSound">
+        <source src="Pou game over sound effect.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+<script>
+    // JavaScript
+    const character = document.getElementById('character');
+    const gameArea = document.getElementById('gameArea');
+    const livesText = document.getElementById('lives');
+    const gameOverScreen = document.getElementById('gameOverScreen');
+    const restartButton = document.getElementById('restartButton');
+    const backgroundMusic = document.getElementById('backgroundMusic');
+    const hitSound = document.getElementById('hitSound');
+    const gameOverSound = document.getElementById('gameOverSound');
+    const startScreen = document.getElementById('startScreen');
+    const playButton = document.getElementById('playButton');
+
+    let characterPosition = 50; // 50% of the width
+    let lives = 3; // Starting lives
+    let gameRunning = true;
+    let fallingEmojisInterval;
+
+    // Tombol Play di klik
+    playButton.addEventListener('click', () => {
+        startScreen.style.display = 'none'; // Sembunyikan layar awal
+        gameArea.style.display = 'block'; // Tampilkan area permainan
+        backgroundMusic.muted = false; // Unmute
+        backgroundMusic.play(); // Mulai musik
+        fallingEmojisInterval = setInterval(createFallingEmoji, 1000); // Mulai emoji jatuh
+    });
+
+    // Gerakan karakter
+    gameArea.addEventListener('mousemove', (e) => {
+        if (!gameRunning) return; // Menghentikan gerakan karakter saat game over
+        const gameAreaRect = gameArea.getBoundingClientRect();
+        const mouseX = e.clientX - gameAreaRect.left;
+        characterPosition = (mouseX / gameAreaRect.width) * 100;
+        character.style.left = `${characterPosition}%`;
+    });
+
+    gameArea.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (!gameRunning) return;
+        const gameAreaRect = gameArea.getBoundingClientRect();
+        const touchX = e.touches[0].clientX - gameAreaRect.left;
+        characterPosition = (touchX / gameAreaRect.width) * 100;
+        character.style.left = `${characterPosition}%`;
+    }, { passive: false });
+
+    // Membuat emoji jatuh secara acak
+    function createFallingEmoji() {
+        const emoji = document.createElement('div');
+        emoji.classList.add('fallingEmoji');
+        emoji.style.backgroundImage = 'url("pixel rock.png")'; // Ganti dengan gambar yang sesuai
+        emoji.style.left = Math.random() * 100 + '%';
+        gameArea.appendChild(emoji);
+
+        let topPosition = -50;
+        const fallInterval = setInterval(() => {
+            if (!gameRunning) {
+                clearInterval(fallInterval);
+                return;
+            }
+            topPosition += 5;
+            emoji.style.top = `${topPosition}px`;
+
+            if (isCollision(emoji)) {
+                decreaseLife();
+                clearInterval(fallInterval);
+                emoji.remove();
+            }
+
+            if (topPosition > window.innerHeight) {
+                clearInterval(fallInterval);
+                emoji.remove();
+            }
+        }, 20);
+    }
+
+// Fungsi untuk memeriksa tabrakan antara karakter fox dan rock
+function isCollision(emoji) {
+    const emojiRect = emoji.getBoundingClientRect();
+    const characterRect = character.getBoundingClientRect();
+
+    // Hanya menghitung tabrakan jika rock sudah berada di bawah fox
+    // dan sudah menyentuh bagian bawah karakter fox
+    return !(
+        emojiRect.top > characterRect.bottom || // Rock masih di atas fox
+        emojiRect.bottom < characterRect.top || // Rock masih di atas fox
+        emojiRect.left > characterRect.right || // Rock ada di kanan fox
+        emojiRect.right < characterRect.left // Rock ada di kiri fox
+    );
+}
+
+
+    // Mengurangi nyawa dan memeriksa game over
+    function decreaseLife() {
+        lives--;
+        livesText.textContent = `Nyawa: ${lives}`;
+        hitSound.play();
+
+        if (lives <= 0) {
+            gameOver();
+        }
+    }
+
+    // Game Over
+    function gameOver() {
+        gameOverScreen.style.display = 'block'; // Tampilkan layar game over
+        gameOverSound.play(); // Mainkan sound effect saat game over
+        backgroundMusic.pause(); // Hentikan musik saat game over
+        backgroundMusic.currentTime = 0; // Mulai ulang musik jika restart
+        clearInterval(fallingEmojisInterval); // Hentikan semua emoji yang jatuh saat game over
+    }
+
+    // Restart game
+    restartButton.addEventListener('click', () => {
+        gameOverScreen.style.display = 'none';
+        resetGame();
+        backgroundMusic.play();
+    });
+
+    // Reset game
+    function resetGame() {
+        lives = 3;
+        livesText.textContent = `Nyawa: ${lives}`;
+        gameRunning = true;
+        fallingEmojisInterval = setInterval(createFallingEmoji, 1000);
+    }
+</script>
+</body>
+</html>
