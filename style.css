@@ -6,15 +6,28 @@ body, html {
     font-family: 'Press Start 2P', sans-serif;
 }
 
+@media screen and (max-width: 768px) {
+    #character {
+        width: 120px !important;
+        height: 120px !important;
+        bottom: 30px !important;
+    }
+
+    .fallingEmoji {
+        width: 50px !important;
+        height: 50px !important;
+    }
+}
+
 #startScreen {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('home screen.png'); /* Ganti dengan path gambar PNG yang kamu inginkan */
-    background-size: cover; /* Agar gambar memenuhi layar */
-    background-position: center; /* Menjaga gambar tetap di tengah */
+    background-image: url('home screen.png');
+    background-size: cover;
+    background-position: center;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,7 +36,6 @@ body, html {
     text-align: center;
 }
 
-/* Gaya untuk tombol Play */
 #playButton {
     font-family: 'Press Start 2P', sans-serif;
     padding: 15px 30px;
@@ -40,7 +52,6 @@ body, html {
     background-color: #c0392b;
 }
 
-/* Gaya untuk teks penyambutan */
 #welcomeMessage {
     font-size: 36px;
     margin-bottom: 20px;
@@ -50,43 +61,51 @@ body, html {
     position: relative;
     width: 100%;
     height: 100vh;
-    background-image: url('background.jpg'); /* Ganti dengan link gambar background */
+    background-image: url('background.jpg');
     background-size: cover;
     background-position: center;
     overflow: hidden;
 }
 
 #character {
-    width: 170px;
-    height: 170px;
+    width: 165px;
+    height: 165px;
     position: absolute;
     bottom: 10px;
-    left: 50%; /* Posisi karakter di tengah */
-    transform: translateX(-50%); /* Membuat karakter tepat di tengah */
-    background-image: url('pixel fox.png'); /* Ganti dengan link gambar karakter */
+    left: 50%;
+    transform: translateX(-50%);
+    background-image: url('pixel fox.png');
     background-size: contain;
     background-repeat: no-repeat;
 }
 
 .fallingEmoji {
     position: absolute;
-    width: 80px; /* Ukuran emoji */
-    height: 80px;
-    background-image: url("pixel rock.png"); /* Ganti dengan gambar rock */
+    width: 70px;
+    height: 70px;
+    background-image: url("pixel rock.png");
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     animation: fall 3s linear infinite;
 }
 
-#lives {
+#lives, #score {
     position: absolute;
     top: 10px;
-    left: 10px;
     font-size: 20px;
     color: white;
     z-index: 10;
 }
+
+#lives {
+    right: 10px;
+}
+
+#score {
+    left: 10px;
+}
+
 
 @keyframes fall {
     0% {
@@ -97,29 +116,28 @@ body, html {
     }
 }
 
-/* Menambahkan gaya untuk game over screen */
 #gameOverScreen {
-    position: fixed; /* Agar tetap di posisi tetap di layar */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Background transparan hitam */
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
-    justify-content: center; /* Menengahkan secara horizontal */
+    justify-content: center;
+    align-items: center;
     text-align: center;
-    align-items: center; /* Menengahkan secara vertikal */
-    flex-direction: column; /* Menyusun teks dan tombol secara vertikal */
+    flex-direction: column;
     color: white;
     font-size: 24px;
-    display: none; /* Sembunyikan layar game over saat game berjalan */
-    z-index: 9999; /* Pastikan elemen ini di atas semua elemen lainnya */
+    display: none;
+    z-index: 9999;
 }
 
 #gameOverText {
-    margin-top: 15%;
     font-size: 36px;
-    margin-bottom: 20px; /* Memberikan jarak antara teks dan tombol */
+    margin-bottom: 20px;
+    margin-top: 15%;
 }
 
 #restartButton {
@@ -138,8 +156,6 @@ body, html {
     background-color: #e53935;
 }
 
-
-
 .hidden {
     display: none;
 }
@@ -149,16 +165,4 @@ button {
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
-}
-
-@media (max-width: 768px) {
-    #character {
-        width: 80px; /* Menyesuaikan ukuran karakter di perangkat kecil */
-        height: 80px;
-    }
-
-    .fallingEmoji {
-        width: 40px; /* Menyesuaikan ukuran emoji di perangkat kecil */
-        height: 40px;
-    }
 }
