@@ -10,16 +10,18 @@
 <body>
     <!-- Tampilan Awal -->
     <div id="startScreen">
-        <div id="welcomeMessage">Avoid the rock!</div>
+        <div id="welcomeMessage">Avoid the Rock!</div>
         <button id="playButton">Play</button>
     </div>
 
-    <!-- Game Area (disembunyikan hingga tombol play diklik) -->
+    <!-- Game Area -->
     <div id="gameArea" style="display: none;">
         <div id="character"></div>
-        <div id="lives">Nyawa: 3</div>
+        <div id="lives">Heart: 3</div>
+        <div id="score">Score: 0</div>
         <div id="gameOverScreen" class="hidden">
             <div id="gameOverText">Game Over</div>
+            <div id="finalScoreText"></div>            
             <button id="restartButton">Restart</button>
         </div>
     </div>
@@ -43,10 +45,10 @@
     </audio>
 
 <script>
-    // JavaScript
     const character = document.getElementById('character');
     const gameArea = document.getElementById('gameArea');
     const livesText = document.getElementById('lives');
+    const scoreText = document.getElementById('score');
     const gameOverScreen = document.getElementById('gameOverScreen');
     const restartButton = document.getElementById('restartButton');
     const backgroundMusic = document.getElementById('backgroundMusic');
@@ -55,23 +57,24 @@
     const startScreen = document.getElementById('startScreen');
     const playButton = document.getElementById('playButton');
 
-    let characterPosition = 50; // 50% of the width
-    let lives = 3; // Starting lives
+    let characterPosition = 50;
+    let lives = 3;
+    let score = 0;
     let gameRunning = true;
     let fallingEmojisInterval;
+    let scoreInterval;
 
-    // Tombol Play di klik
     playButton.addEventListener('click', () => {
-        startScreen.style.display = 'none'; // Sembunyikan layar awal
-        gameArea.style.display = 'block'; // Tampilkan area permainan
-        backgroundMusic.muted = false; // Unmute
-        backgroundMusic.play(); // Mulai musik
-        fallingEmojisInterval = setInterval(createFallingEmoji, 1000); // Mulai emoji jatuh
+        startScreen.style.display = 'none';
+        gameArea.style.display = 'block';
+        backgroundMusic.muted = false;
+        backgroundMusic.play();
+        startScoreCounter();
+        fallingEmojisInterval = setInterval(createFallingEmoji, 1000);
     });
 
-    // Gerakan karakter
     gameArea.addEventListener('mousemove', (e) => {
-        if (!gameRunning) return; // Menghentikan gerakan karakter saat game over
+        if (!gameRunning) return;
         const gameAreaRect = gameArea.getBoundingClientRect();
         const mouseX = e.clientX - gameAreaRect.left;
         characterPosition = (mouseX / gameAreaRect.width) * 100;
@@ -87,11 +90,10 @@
         character.style.left = `${characterPosition}%`;
     }, { passive: false });
 
-    // Membuat emoji jatuh secara acak
     function createFallingEmoji() {
         const emoji = document.createElement('div');
         emoji.classList.add('fallingEmoji');
-        emoji.style.backgroundImage = 'url("pixel rock.png")'; // Ganti dengan gambar yang sesuai
+        emoji.style.backgroundImage = 'url("pixel rock.png")';
         emoji.style.left = Math.random() * 100 + '%';
         gameArea.appendChild(emoji);
 
@@ -117,26 +119,21 @@
         }, 20);
     }
 
-// Fungsi untuk memeriksa tabrakan antara karakter fox dan rock
-function isCollision(emoji) {
-    const emojiRect = emoji.getBoundingClientRect();
-    const characterRect = character.getBoundingClientRect();
+    function isCollision(emoji) {
+        const emojiRect = emoji.getBoundingClientRect();
+        const characterRect = character.getBoundingClientRect();
 
-    // Hanya menghitung tabrakan jika rock sudah berada di bawah fox
-    // dan sudah menyentuh bagian bawah karakter fox
-    return !(
-        emojiRect.top > characterRect.bottom || // Rock masih di atas fox
-        emojiRect.bottom < characterRect.top || // Rock masih di atas fox
-        emojiRect.left > characterRect.right || // Rock ada di kanan fox
-        emojiRect.right < characterRect.left // Rock ada di kiri fox
-    );
-}
+        return !(
+            emojiRect.top > characterRect.bottom ||
+            emojiRect.bottom < characterRect.top ||
+            emojiRect.left > characterRect.right ||
+            emojiRect.right < characterRect.left
+        );
+    }
 
-
-    // Mengurangi nyawa dan memeriksa game over
     function decreaseLife() {
         lives--;
-        livesText.textContent = `Nyawa: ${lives}`;
+        livesText.textContent = `Heart: ${lives}`;
         hitSound.play();
 
         if (lives <= 0) {
@@ -144,28 +141,47 @@ function isCollision(emoji) {
         }
     }
 
-    // Game Over
     function gameOver() {
-        gameOverScreen.style.display = 'block'; // Tampilkan layar game over
-        gameOverSound.play(); // Mainkan sound effect saat game over
-        backgroundMusic.pause(); // Hentikan musik saat game over
-        backgroundMusic.currentTime = 0; // Mulai ulang musik jika restart
-        clearInterval(fallingEmojisInterval); // Hentikan semua emoji yang jatuh saat game over
-    }
+    gameOverScreen.style.display = 'block';
+    gameOverSound.play();
+    backgroundMusic.pause();
+    backgroundMusic.currentTime = 0;
+    clearInterval(fallingEmojisInterval);
+    stopScoreCounter();
 
-    // Restart game
+    document.getElementById('gameOverText').textContent = `Game Over`;
+    document.getElementById('finalScoreText').textContent = `Final Score: ${score}`;
+}
+
+
     restartButton.addEventListener('click', () => {
         gameOverScreen.style.display = 'none';
         resetGame();
         backgroundMusic.play();
     });
 
-    // Reset game
     function resetGame() {
         lives = 3;
-        livesText.textContent = `Nyawa: ${lives}`;
+        score = 0;
+        livesText.textContent = `Heart: ${lives}`;
+        scoreText.textContent = `Score: ${score}`;
         gameRunning = true;
+        startScoreCounter();
         fallingEmojisInterval = setInterval(createFallingEmoji, 1000);
+    }
+
+    // Start and stop score counter
+    function startScoreCounter() {
+        scoreInterval = setInterval(() => {
+            if (lives > 0) {
+                score++;
+                scoreText.textContent = `Score: ${score}`;
+            }
+        }, 1000); // Tambahkan skor setiap detik
+    }
+
+    function stopScoreCounter() {
+        clearInterval(scoreInterval);
     }
 </script>
 </body>
